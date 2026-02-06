@@ -1,0 +1,27 @@
+# Core
+numpy>=1.23
+pandas>=2.0
+
+# Visualization
+matplotlib>=3.7
+seaborn>=0.12
+
+# Bayesian Modeling
+pymc>=5.10
+arviz>=0.17
+
+# Time Series
+statsmodels>=0.14
+
+# Dashboard
+streamlit>=1.30
+
+# Jupyter
+notebook>=7.0
+ipykernel
+
+# Testing
+pytest>=7.4
+
+# Utilities
+scikit-learn>=1.3
