@@ -38,3 +38,7 @@ This project analyzes historical Brent oil prices to study how major geopolitica
    - Estimate mean price levels before and after breaks.
    - Provide uncertainty estimates.
 
+   ### Error Handling
+
+The data loading pipeline includes basic validation for file existence, required columns, and date parsing. Informative error messages are provided to prevent silent failures and improve robustness.
+
