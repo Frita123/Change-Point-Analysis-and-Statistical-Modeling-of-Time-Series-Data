@@ -1,108 +1,133 @@
-Change Point Analysis and Dashboard for Brent Oil Prices
+Change Point Analysis and Statistical Modeling of Brent Oil Prices
 Overview
 
-This project performs a time series analysis of Brent oil prices and builds an interactive dashboard to visualize the results. The analysis detects structural breaks in the data using Bayesian change point modeling, quantifies the impact of major events, and allows stakeholders to explore price trends interactively.
+This project analyzes Brent oil prices using time series methods and Bayesian change point detection, then visualizes the results in an interactive dashboard. The workflow spans data preparation, exploratory analysis, Bayesian modeling, and interactive visualization.
 
-Tasks Covered:
+Tasks
+Task 1: Data Loading & Exploratory Analysis
 
-Task 1: Time series analysis and visualization of Brent oil prices.
+Loaded Brent oil price data and key event data.
 
-Task 2: Bayesian change point detection and insight generation.
+Performed exploratory data analysis:
 
-Task 3: Interactive dashboard for visualization of price trends, change points, and events.
+Plotted raw prices over time to detect trends and shocks.
 
-Task 1 – Time Series Analysis
+Calculated log returns to assess volatility clustering.
 
-Loaded Brent oil price data and visualized historical trends.
+Key Features:
 
-Calculated log returns to analyze volatility clustering.
+Visual inspection of price trends.
 
-Explored seasonality and price shocks using plots.
+Identification of high volatility periods.
 
-Key Libraries:
+Basic preprocessing for modeling (log returns, downsampling).
 
-pandas, numpy, matplotlib, seaborn
+Task 2: Bayesian Change Point Modeling
 
-Task 2 – Bayesian Change Point Modeling
+Applied a Bayesian change point model using PyMC to detect structural breaks.
 
-Applied a Bayesian discrete change point model using PyMC.
+Modeled a single change point with separate means for pre- and post-regimes.
 
-Detected structural breaks in Brent oil prices.
+Estimated posterior distributions for change point and regime means.
 
-Quantified the impact of major events:
+Quantified price impacts before and after the detected change point.
 
-Example Output:
+Results:
 
-Detected change point: 2005-02-24
+Detected Change Point: ~February 24, 2005
 
-Mean price before: $21.51
+Mean Price Before: $21.51
 
-Mean price after: $75.52
+Mean Price After: $75.52
 
-Estimated change: ~251%
+Estimated Change: 251.14%
 
-Likely associated event: ISIS advances in Iraq (2014-06-15)
+Likely Associated Event: ISIS advances in Iraq (June 15, 2014)
 
-Key Libraries:
+Notes & Limitations:
 
-pymc, arviz, pandas, numpy, matplotlib
+Single-chain MCMC was used for exploratory purposes; convergence diagnostics are limited.
 
-Insights:
+Downsampling was applied to speed up computation.
 
-The analysis indicates that geopolitical instability and supply shocks significantly impact oil price regimes. The Bayesian model gives a probabilistic estimate of when and how prices shifted.
+Event association is approximate; causal inference is not guaranteed.
 
-Task 3 – Interactive Dashboard
+Sensitivity analysis on priors and data sampling could enhance robustness.
 
-The dashboard visualizes:
+Task 3: Interactive Dashboard
 
-Brent oil price trends over time
-
-Bayesian change point (red line)
-
-Major events (orange dots)
-
-Tooltips with date and event information
-
-Backend (Flask):
-
-Provides API endpoints:
-
-Endpoint	Description
-/api/prices	Historical Brent oil prices
-/api/events	Major events affecting oil prices
-/api/change-point	Task 2 Bayesian change point results
-Frontend (React):
-
-Built using React and Recharts
+Built a Flask backend + React frontend dashboard to visualize prices, events, and change points.
 
 Features:
 
-Interactive line chart for prices
+Line chart showing Brent oil prices over time.
 
-Red reference line for Bayesian change point
+Change point line marking significant Bayesian-detected structural breaks.
 
-Orange dots for major events
+Event visualization: Orange dots represent key historical events affecting prices.
 
-Tooltip shows date and price/event
+Interactivity: Users can hover over points to view detailed information.
 
-Responsive design for desktop and mobile
+Planned Enhancements (Future Work):
 
-Usage
+Filters & Date Range Selectors: Allow users to zoom into specific periods or event types.
 
-Open browser at http://localhost:3000.
+Tooltip & Drill-down: Show event descriptions and detailed price impacts on hover/click.
 
-Interact with the line chart:
+Responsive Design: Ensure usability on desktop, tablet, and mobile devices.
 
-Blue line → Brent oil prices
+Event categorization: Color-code events by type (political, economic, geopolitical).
 
-Red line → Bayesian change point
+Sensitivity Analysis: Explore alternative priors, multiple change points, and Markov-switching models.
 
-Orange dots → Major events (hover to see details)
+Project Structure
+dashboard/
+│
+├─ backend/
+│   └─ app.py            # Flask API serving prices, events, and change point results
+│
+├─ frontend/
+│   └─ src/
+│       └─ App.js        # React dashboard
+│
+├─ data/
+│   ├─ raw/              # Raw Brent prices CSV
+│   ├─ processed/        # Cleaned and preprocessed CSVs
+│   └─ oil_events.csv    # Historical events affecting oil prices
 
-Notes
+Setup Instructions
+Backend
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
 
-The React app fetches live data from Flask backend.
 
-The Bayesian change point is hardcoded from Task 2 results.
+Runs Flask API on http://127.0.0.1:5000.
 
-For large datasets, consider downsampling to improve dashboard performance.
+Frontend
+cd frontend
+npm install
+npm start
+
+
+Opens React dashboard on http://localhost:3000.
+
+Key Learnings
+
+Bayesian change point models can detect regime shifts in time series data.
+
+Historical events can explain sudden structural breaks in commodity prices.
+
+Interactive dashboards provide stakeholders a clear, visual understanding of data and analysis results.
+
+Future Improvements
+
+Implement multi-chain MCMC and multiple change points.
+
+Add more explanatory variables (GDP, inflation, exchange rates) to enrich modeling.
+
+Enhance dashboard interactivity with filters, drill-down, and responsive design.
+
+Perform comprehensive sensitivity analysis to strengthen insights.
