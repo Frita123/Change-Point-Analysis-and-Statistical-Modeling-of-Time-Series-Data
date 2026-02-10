@@ -15,95 +15,132 @@ import {
 function App() {
   const [prices, setPrices] = useState([]);
   const [events, setEvents] = useState([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [error, setError] = useState("");
 
-  const CHANGE_POINT = "2/24/2005"; // US format
+  const [dateRange, setDateRange] = useState([null, null]); // [start, end]
+  const [selectedEvent, setSelectedEvent] = useState("All");
+
+  const changePoint = "2/24/2005"; // US date format
 
   useEffect(() => {
-    // Load prices
-    fetch("http://127.0.0.1:5000/api/prices")
-      .then((res) => res.json())
-      .then((data) => {
-        const formatted = data.map((item) => ({
-          date: new Date(item.Date).toLocaleDateString(),
-          price: item.Price,
+    async function fetchData() {
+      try {
+        // Fetch prices
+        const pricesRes = await fetch("http://127.0.0.1:5000/api/prices");
+        if (!pricesRes.ok) throw new Error("Failed to fetch prices");
+        const pricesData = await pricesRes.json();
+        const formattedPrices = pricesData.map(item => ({
+          date: new Date(item.Date),
+          price: item.Price
         }));
-        setPrices(formatted);
-        // Set default date filter
-        setStartDate(formatted[0].date);
-        setEndDate(formatted[formatted.length - 1].date);
-      })
-      .catch((err) => console.error("Failed to load prices:", err));
+        setPrices(formattedPrices);
 
-    // Load events
-    fetch("http://127.0.0.1:5000/api/events")
-      .then((res) => res.json())
-      .then((data) => {
-        const formattedEvents = data.map((e) => ({
-          date: new Date(e.date).toLocaleDateString(),
-          event: e.event,
+        // Fetch events
+        const eventsRes = await fetch("http://127.0.0.1:5000/api/events");
+        if (!eventsRes.ok) throw new Error("Failed to fetch events");
+        const eventsData = await eventsRes.json();
+        const formattedEvents = eventsData.map(e => ({
+          date: new Date(e.date),
+          event: e.event
         }));
         setEvents(formattedEvents);
-      })
-      .catch((err) => console.error("Failed to load events:", err));
+
+      } catch (err) {
+        setError(err.message);
+      }
+    }
+
+    fetchData();
   }, []);
 
-  // Filter data by date range
-  const filteredPrices = prices.filter(
-    (p) => p.date >= startDate && p.date <= endDate
-  );
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
-  // Merge events with price points
+  // Filter prices by date range
+  const filteredPrices = prices.filter(p => {
+    const startOk = !dateRange[0] || p.date >= dateRange[0];
+    const endOk = !dateRange[1] || p.date <= dateRange[1];
+    return startOk && endOk;
+  });
+
+  // Filter events by date and type
+  const filteredEvents = events.filter(e => {
+    const inRange = (!dateRange[0] || e.date >= dateRange[0]) && (!dateRange[1] || e.date <= dateRange[1]);
+    const typeMatch = selectedEvent === "All" || e.event === selectedEvent;
+    return inRange && typeMatch;
+  });
+
+  // Match events with price points
   const eventPoints = filteredPrices
-    .map((p) => {
-      const match = events.find((e) => e.date === p.date);
+    .map(p => {
+      const match = filteredEvents.find(e => e.date.toDateString() === p.date.toDateString());
       if (match) return { ...p, event: match.event };
       return null;
     })
     .filter(Boolean);
 
+  // Unique event types for dropdown
+  const eventTypes = ["All", ...Array.from(new Set(events.map(e => e.event)))];
+
+  // Custom tooltip to show event name
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const priceData = payload.find(p => p.dataKey === "price");
+      const eventData = payload.find(p => p.dataKey === "event");
+      return (
+        <div style={{ backgroundColor: "white", border: "1px solid #ccc", padding: 10 }}>
+          <p>{label.toLocaleDateString()}</p>
+          {priceData && <p>Price: ${priceData.value}</p>}
+          {eventData && <p>Event: {eventData.value}</p>}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div style={{ padding: 30 }}>
       <h2>Brent Oil Prices Over Time</h2>
 
-      {/* Date range filters */}
       <div style={{ marginBottom: 20 }}>
         <label>
           Start Date:{" "}
           <input
             type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            onChange={e => setDateRange([new Date(e.target.value), dateRange[1]])}
           />
         </label>
-        <label style={{ marginLeft: 20 }}>
+        &nbsp;&nbsp;
+        <label>
           End Date:{" "}
           <input
             type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            onChange={e => setDateRange([dateRange[0], new Date(e.target.value)])}
           />
+        </label>
+        &nbsp;&nbsp;
+        <label>
+          Event Type:{" "}
+          <select onChange={e => setSelectedEvent(e.target.value)}>
+            {eventTypes.map(ev => <option key={ev} value={ev}>{ev}</option>)}
+          </select>
         </label>
       </div>
 
       <ResponsiveContainer width="100%" height={500}>
         <LineChart data={filteredPrices}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" hide />
+          <XAxis dataKey="date" tickFormatter={date => date.toLocaleDateString()} />
           <YAxis />
-          <Tooltip
-            formatter={(value, name, props) => [`$${value}`, "Price"]}
-            labelFormatter={(label) => `Date: ${label}`}
-          />
+          <Tooltip content={CustomTooltip} />
+
+          {/* Legend */}
           <Legend />
 
-          {/* Change point line */}
+          {/* Change point */}
           <ReferenceLine
-            x={CHANGE_POINT}
+            x={new Date(changePoint)}
             stroke="red"
-            strokeDasharray="5 5"
-            label={{ value: "Change Point", position: "top", fill: "red" }}
+            label="Change Point"
           />
 
           {/* Price line */}
@@ -112,9 +149,8 @@ function App() {
           {/* Event dots */}
           <Scatter
             data={eventPoints}
+            dataKey="event"
             fill="orange"
-            shape="circle"
-            legendType="circle"
           />
         </LineChart>
       </ResponsiveContainer>
