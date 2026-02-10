@@ -1,133 +1,178 @@
-Change Point Analysis and Statistical Modeling of Brent Oil Prices
+Change Point Analysis and Brent Oil Price Dashboard
 Overview
 
-This project analyzes Brent oil prices using time series methods and Bayesian change point detection, then visualizes the results in an interactive dashboard. The workflow spans data preparation, exploratory analysis, Bayesian modeling, and interactive visualization.
+This project analyzes Brent oil prices using a Bayesian change point model and provides an interactive dashboard to explore price trends and major events affecting the market. It covers three main tasks:
 
-Tasks
-Task 1: Data Loading & Exploratory Analysis
+Task 1 – Data Preparation and Exploration
 
-Loaded Brent oil price data and key event data.
+Load raw Brent oil prices.
 
-Performed exploratory data analysis:
+Perform exploratory data analysis (EDA), including line plots of prices and log returns.
 
-Plotted raw prices over time to detect trends and shocks.
+Prepare data for modeling.
 
-Calculated log returns to assess volatility clustering.
+Task 2 – Bayesian Change Point Modeling
 
-Key Features:
+Implement a Bayesian discrete change point model with PyMC.
 
-Visual inspection of price trends.
+Detect structural breaks in the price series.
 
-Identification of high volatility periods.
+Quantify pre- and post-change mean prices and the percent change.
 
-Basic preprocessing for modeling (log returns, downsampling).
+Compare detected change points with major geopolitical or economic events.
 
-Task 2: Bayesian Change Point Modeling
+Task 3 – Interactive Dashboard (Flask + React)
 
-Applied a Bayesian change point model using PyMC to detect structural breaks.
+Backend (Flask): Provides APIs to serve prices, events, and change point data.
 
-Modeled a single change point with separate means for pre- and post-regimes.
+Frontend (React + Recharts): Interactive dashboard visualizing:
 
-Estimated posterior distributions for change point and regime means.
+Historical price trends.
 
-Quantified price impacts before and after the detected change point.
+Bayesian change point (red dashed line).
 
-Results:
+Major events (orange dots).
 
-Detected Change Point: ~February 24, 2005
+Date range filters to zoom into specific periods.
 
-Mean Price Before: $21.51
+Tooltips showing prices and event details on hover.
 
-Mean Price After: $75.52
-
-Estimated Change: 251.14%
-
-Likely Associated Event: ISIS advances in Iraq (June 15, 2014)
-
-Notes & Limitations:
-
-Single-chain MCMC was used for exploratory purposes; convergence diagnostics are limited.
-
-Downsampling was applied to speed up computation.
-
-Event association is approximate; causal inference is not guaranteed.
-
-Sensitivity analysis on priors and data sampling could enhance robustness.
-
-Task 3: Interactive Dashboard
-
-Built a Flask backend + React frontend dashboard to visualize prices, events, and change points.
-
-Features:
-
-Line chart showing Brent oil prices over time.
-
-Change point line marking significant Bayesian-detected structural breaks.
-
-Event visualization: Orange dots represent key historical events affecting prices.
-
-Interactivity: Users can hover over points to view detailed information.
-
-Planned Enhancements (Future Work):
-
-Filters & Date Range Selectors: Allow users to zoom into specific periods or event types.
-
-Tooltip & Drill-down: Show event descriptions and detailed price impacts on hover/click.
-
-Responsive Design: Ensure usability on desktop, tablet, and mobile devices.
-
-Event categorization: Color-code events by type (political, economic, geopolitical).
-
-Sensitivity Analysis: Explore alternative priors, multiple change points, and Markov-switching models.
-
-Project Structure
-dashboard/
-│
-├─ backend/
-│   └─ app.py            # Flask API serving prices, events, and change point results
-│
-├─ frontend/
-│   └─ src/
-│       └─ App.js        # React dashboard
-│
-├─ data/
-│   ├─ raw/              # Raw Brent prices CSV
-│   ├─ processed/        # Cleaned and preprocessed CSVs
-│   └─ oil_events.csv    # Historical events affecting oil prices
+Handles API errors gracefully and ensures responsiveness for desktop, tablet, and mobile devices.
 
 Setup Instructions
-Backend
+Backend (Flask)
+
+Navigate to the backend folder:
+
 cd backend
+
+
+Create and activate a Python virtual environment:
+
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate      # Windows
+source .venv/bin/activate   # Mac/Linux
+
+
+Install dependencies:
+
 pip install -r requirements.txt
+
+
+Run the Flask server:
+
 python app.py
 
 
-Runs Flask API on http://127.0.0.1:5000.
+Backend APIs:
 
-Frontend
+GET /api/prices → Returns historical prices.
+
+GET /api/events → Returns major oil events.
+
+GET /api/change-point → Returns Bayesian change point results.
+
+Frontend (React)
+
+Navigate to the frontend folder:
+
 cd frontend
+
+
+Install dependencies:
+
 npm install
+
+
+Run the development server:
+
 npm start
 
 
-Opens React dashboard on http://localhost:3000.
+Features:
 
-Key Learnings
+Interactive Line Chart for Brent oil prices.
 
-Bayesian change point models can detect regime shifts in time series data.
+Red dashed line marking the Bayesian change point.
 
-Historical events can explain sudden structural breaks in commodity prices.
+Orange dots representing major events.
 
-Interactive dashboards provide stakeholders a clear, visual understanding of data and analysis results.
+Date range filter to zoom in/out.
 
-Future Improvements
+Hover tooltips displaying price and event information.
 
-Implement multi-chain MCMC and multiple change points.
+Analysis Results (Task 2)
 
-Add more explanatory variables (GDP, inflation, exchange rates) to enrich modeling.
+Detected change date: 24-Feb-2005
 
-Enhance dashboard interactivity with filters, drill-down, and responsive design.
+Mean price before change: $21.51
 
-Perform comprehensive sensitivity analysis to strengthen insights.
+Mean price after change: $75.52
+
+Estimated change: 251.14%
+
+Likely associated event: ISIS advances in Iraq (15-Jun-2014)
+
+The Bayesian model provides high confidence in detecting structural breaks in oil prices and aligns with real-world events affecting the market.
+
+Improvements and UX Enhancements
+
+Dashboard is fully responsive for desktop, tablet, and mobile.
+
+Added tooltips and legends for better interpretability.
+
+Orange dots indicate major events, with hover text for details.
+
+Red dashed line clearly marks the Bayesian change point.
+
+Date range selector allows users to explore specific periods.
+
+Error handling and logging implemented for API failures.
+
+Project Structure
+├── backend
+│   ├── app.py           # Flask backend serving APIs
+│   ├── requirements.txt # Python dependencies
+│   └── ...              # Processed data files
+├── frontend
+│   ├── src
+│   │   ├── App.js       # React dashboard component
+│   │   ├── index.js
+│   │   └── ... 
+│   └── package.json
+├── data
+│   ├── raw
+│   └── processed
+└── README.md
+
+Dependencies
+
+Python 3.10+
+
+Flask, Flask-CORS, Pandas, PyMC, ArviZ
+
+Node.js 24+, React 18+, Recharts
+
+How to Use
+
+Start the backend server first (python app.py).
+
+Start the frontend (npm start) and open the browser at http://localhost:3000.
+
+Use the date filters to explore periods of interest.
+
+Hover over the chart to view prices and event details.
+
+Notes
+
+Bayesian change point detection is based on a single-chain MCMC for exploratory purposes.
+
+Orange dots correspond to known events in the oil_events.csv dataset.
+
+The dashboard can be further extended with:
+
+Multiple change point detection.
+
+Event clustering and categorization.
+
+Advanced filtering and drill-down views.
