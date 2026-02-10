@@ -1,44 +1,108 @@
-# Change-Point-Analysis-and-Statistical-Modeling-of-Time-Series-Data
-# Brent Oil Price Change Point Analysis — Task 1
+Change Point Analysis and Dashboard for Brent Oil Prices
+Overview
 
-## Overview
+This project performs a time series analysis of Brent oil prices and builds an interactive dashboard to visualize the results. The analysis detects structural breaks in the data using Bayesian change point modeling, quantifies the impact of major events, and allows stakeholders to explore price trends interactively.
 
-This project analyzes historical Brent oil prices to study how major geopolitical, economic, and policy events affect the market. Task 1 focuses on laying the foundation for analysis, including data preparation, exploratory data analysis (EDA), and compilation of key events.
+Tasks Covered:
 
+Task 1: Time series analysis and visualization of Brent oil prices.
 
----
+Task 2: Bayesian change point detection and insight generation.
 
-## Task 1 Objectives
+Task 3: Interactive dashboard for visualization of price trends, change points, and events.
 
-1. **Define the Data Analysis Workflow**  
-   - Outline the steps from data loading to insights.
-   - Plan future modeling (change point detection).
+Task 1 – Time Series Analysis
 
-2. **Explore Brent Oil Prices**  
-   - Trend analysis and visualization.
-   - Compute daily returns and 30-day rolling volatility.
-   - Perform stationarity testing (ADF test).
+Loaded Brent oil price data and visualized historical trends.
 
-3. **Compile Key Events**  
-   - Document 10–15 major geopolitical, economic, and OPEC-related events in `oil_events.csv`.
+Calculated log returns to analyze volatility clustering.
 
-4. **Document Assumptions and Limitations**  
-   - Correlation vs causation.
-   - Market anticipations.
-   - Unmodeled factors such as demand, currency fluctuations, or speculation.
+Explored seasonality and price shocks using plots.
 
-5. **Plan Communication Channels**  
-   - Technical report (`task1_foundation.md`)
-   - Jupyter notebooks
-   - Interactive dashboard (future)
-   - Stakeholder presentations
+Key Libraries:
 
-6. **Understand Change Point Models**  
-   - Identify structural breaks in price series.
-   - Estimate mean price levels before and after breaks.
-   - Provide uncertainty estimates.
+pandas, numpy, matplotlib, seaborn
 
-   ### Error Handling
+Task 2 – Bayesian Change Point Modeling
 
-The data loading pipeline includes basic validation for file existence, required columns, and date parsing. Informative error messages are provided to prevent silent failures and improve robustness.
+Applied a Bayesian discrete change point model using PyMC.
 
+Detected structural breaks in Brent oil prices.
+
+Quantified the impact of major events:
+
+Example Output:
+
+Detected change point: 2005-02-24
+
+Mean price before: $21.51
+
+Mean price after: $75.52
+
+Estimated change: ~251%
+
+Likely associated event: ISIS advances in Iraq (2014-06-15)
+
+Key Libraries:
+
+pymc, arviz, pandas, numpy, matplotlib
+
+Insights:
+
+The analysis indicates that geopolitical instability and supply shocks significantly impact oil price regimes. The Bayesian model gives a probabilistic estimate of when and how prices shifted.
+
+Task 3 – Interactive Dashboard
+
+The dashboard visualizes:
+
+Brent oil price trends over time
+
+Bayesian change point (red line)
+
+Major events (orange dots)
+
+Tooltips with date and event information
+
+Backend (Flask):
+
+Provides API endpoints:
+
+Endpoint	Description
+/api/prices	Historical Brent oil prices
+/api/events	Major events affecting oil prices
+/api/change-point	Task 2 Bayesian change point results
+Frontend (React):
+
+Built using React and Recharts
+
+Features:
+
+Interactive line chart for prices
+
+Red reference line for Bayesian change point
+
+Orange dots for major events
+
+Tooltip shows date and price/event
+
+Responsive design for desktop and mobile
+
+Usage
+
+Open browser at http://localhost:3000.
+
+Interact with the line chart:
+
+Blue line → Brent oil prices
+
+Red line → Bayesian change point
+
+Orange dots → Major events (hover to see details)
+
+Notes
+
+The React app fetches live data from Flask backend.
+
+The Bayesian change point is hardcoded from Task 2 results.
+
+For large datasets, consider downsampling to improve dashboard performance.
